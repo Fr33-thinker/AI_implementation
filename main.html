@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Strategy Co-Pilot (Research Enhanced v2)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #333333; background-color: #f4f6f8; }
+        /* --- Section 1: Vision - Energetic Sunrise --- */
+        :root { --s1-primary: #FF6347; --s1-accent: #FFD700; --s1-bg-light: #FFF5E1; --s1-text-dark: #4A3B31; --s1-border: #FF7F50; --s1-button-bg: #FF8C00; --s1-button-hover: #FFA500; }
+        /* --- Section 2: Prioritize - Dynamic Aqua & Lime --- */
+        :root { --s2-primary: #00CED1; --s2-accent: #32CD32; --s2-bg-light: #E0FFFF; --s2-text-dark: #004D40; --s2-border: #20B2AA; --s2-button-bg: #48D1CC; --s2-button-hover: #20B2AA; }
+        /* --- Section 3: Measure - Focused Fuchsia & Indigo --- */
+        :root { --s3-primary: #C71585; --s3-accent: #8A2BE2; --s3-bg-light: #F8F0F8; --s3-text-dark: #4B0082; --s3-border: #BA55D3; --s3-button-bg: #DA70D6; --s3-button-hover: #BA55D3; }
+
+        .app-header { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .app-title { color: #2c3e50; }
+        .data-buttons button { transition: background-color 0.3s ease; }
+        .section-tab { cursor: pointer; padding: 0.75rem 1.5rem; border-bottom: 3px solid transparent; transition: all 0.3s ease; font-weight: 600; }
+        .section-tab.s1-active { border-color: var(--s1-primary); color: var(--s1-primary); }
+        .section-tab.s2-active { border-color: var(--s2-primary); color: var(--s2-primary); }
+        .section-tab.s3-active { border-color: var(--s3-primary); color: var(--s3-primary); }
+        .section-tab:hover { background-color: #f0f0f0; }
+        .section-content { display: none; padding: 1.5rem; border-radius: 0.5rem; margin-top:1px;}
+        .section-content.active { display: block; }
+        .main-section-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom-width: 3px; }
+        .subsection-title { font-size: 1.25rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.75rem; }
+        .input-group { margin-bottom: 1.25rem; padding: 1rem; background-color: rgba(255,255,255,0.6); border-radius: 0.375rem; border: 1px solid #e8e8e8;}
+        .input-field { border: 1px solid #ccc; padding: 0.5rem 0.75rem; border-radius: 0.25rem; width: 100%; margin-bottom:0.5rem; font-size: 0.9rem; }
+        .input-field:focus { border-color: #888; outline: none; box-shadow: 0 0 0 2px rgba(100,100,100,0.2); }
+        textarea.input-field { min-height: 80px; }
+        label { display: block; margin-bottom: 0.25rem; font-weight: 500; font-size: 0.85rem; }
+        .label-hint {font-size: 0.75rem; color: #777; margin-bottom: 0.25rem; display: block;}
+        .action-button { color: white; padding: 0.6rem 1rem; border-radius: 0.25rem; font-weight: 500; font-size:0.9rem; transition: background-color 0.3s ease; cursor:pointer; border:none;}
+        .delete-button { background-color: #e74c3c; } .delete-button:hover { background-color: #c0392b; }
+        .edit-button { background-color: #3498db; margin-left: 0.5rem; } .edit-button:hover { background-color: #2980b9; }
+        .item-card { background-color: #fff; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 0.375rem; margin-bottom: 0.75rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .item-card h4 { font-weight: 600; margin-bottom: 0.25rem; }
+        .item-card p { font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .item-card .detail-label { font-weight: 500; }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin: 1rem auto; height: 320px; max-height: 400px; background-color: #fff; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 25px; border: 1px solid #888; border-radius: 0.5rem; width: 95%; max-width: 750px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;}
+        .modal-header { padding-bottom: 10px; border-bottom: 1px solid #eee; margin-bottom: 15px; }
+        .modal-title { font-size: 1.5rem; font-weight: 600; }
+        .modal-section-title { font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; padding-bottom: 0.25rem; border-bottom: 1px solid #eee;}
+        .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-button:hover, .close-button:focus { color: black; text-decoration: none; }
+        .s1-button { background-color: var(--s1-button-bg); } .s1-button:hover { background-color: var(--s1-button-hover); }
+        .s2-button { background-color: var(--s2-button-bg); } .s2-button:hover { background-color: var(--s2-button-hover); }
+        .s3-button { background-color: var(--s3-button-bg); } .s3-button:hover { background-color: var(--s3-button-hover); }
+        #toast-notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #333; color: white; padding: 12px 20px; border-radius: 4px; z-index: 2000; opacity: 0; transition: opacity 0.5s ease-in-out; font-size: 0.9rem; }
+        #toast-notification.show { opacity: 1; }
+        .checkbox-group label {font-weight: normal; font-size: 0.85rem; margin-right: 10px;}
+        .checkbox-group input[type="checkbox"] {margin-right: 5px;}
+    </style>
+</head>
+<body class="p-0">
+    <header class="app-header p-4 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="app-title text-2xl sm:text-3xl font-bold mb-2 sm:mb-0">AI Strategy Co-Pilot</h1>
+            <div class="data-buttons flex space-x-2">
+                <button id="saveDataButton" class="action-button bg-green-500 hover:bg-green-600 text-xs sm:text-sm">Save Data</button>
+                <button id="loadDataButton" class="action-button bg-blue-500 hover:bg-blue-600 text-xs sm:text-sm">Load Data</button>
+                <button id="clearDataButton" class="action-button bg-red-500 hover:bg-red-600 text-xs sm:text-sm">Clear Data</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-sm sticky top-[70px] sm:top-[68px] z-40">
+        <div class="max-w-6xl mx-auto flex justify-center sm:justify-start">
+            <div id="tab-vision" class="section-tab s1-active">1. Establish Vision</div>
+            <div id="tab-prioritize" class="section-tab">2. Prioritize Use Cases</div>
+            <div id="tab-measure" class="section-tab">3. Measure Results</div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-4 md:p-6">
+        <section id="content-vision" class="section-content active" style="background-color: var(--s1-bg-light);">
+            <h2 class="main-section-title" style="color: var(--s1-primary); border-color: var(--s1-primary);">1. Establish a Clear Vision</h2>
+            <p class="mb-6" style="color: var(--s1-text-dark);">Define a clear AI vision aligned with business objectives. Capture corporate strategy, identify priorities & themes, assess capabilities, plan communication, and embed responsible AI principles from the start.</p>
+            
+            <div class="input-group">
+                <h3 class="subsection-title" style="color: var(--s1-accent);">Client's Corporate Strategy & AI Ambition</h3>
+                <label for="s1-corporate-strategy">Overall Corporate Strategy:</label>
+                <textarea id="s1-corporate-strategy" class="input-field" placeholder="Client's overarching business goals, market position, competitive advantages..."></textarea>
+                <label for="s1-ai-ambition" class="mt-2">Client's AI Ambition Statement:</label>
+                <textarea id="s1-ai-ambition" class="input-field" placeholder="e.g., 'To be an industry leader in AI-driven customer experience,' 'Fast follower adopting proven AI for operational efficiency,' 'Cautious adopter for niche, high-impact areas.'"></textarea>
+                 <label for="s1-vision-methodology" class="mt-2">Vision Development Methodology Notes:</label>
+                <textarea id="s1-vision-methodology" class="input-field" placeholder="e.g., Hybrid approach: Top-down leadership workshops, bottom-up front-line idea submissions..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <h3 class="subsection-title" style="color: var(--s1-accent);">Strategic Priorities & Associated Goals</h3>
+                <div class="flex items-center mb-2">
+                    <input type="text" id="s1-new-priority-text" class="input-field flex-grow mr-2" placeholder="Add Strategic Priority (Press Enter to Add)...">
+                    <button id="s1-add-priority-btn" class="action-button s1-button">Add Priority</button>
+                </div>
+                <div id="s1-priorities-list" class="space-y-3"></div>
+            </div>
+
+            <div class="input-group">
+                <h3 class="subsection-title" style="color: var(--s1-accent);">AI Themes/Domains <span class="text-sm font-normal">(Link to Priorities)</span></h3>
+                 <select id="s1-theme-priority-select" class="input-field mb-2">
+                    <option value="">Select a Strategic Priority to add themes to...</option>
+                </select>
+                <div class="flex items-center mb-2">
+                    <input type="text" id="s1-new-theme-text" class="input-field flex-grow mr-2" placeholder="Add AI Theme for selected priority (Press Enter to Add)...">
+                    <button id="s1-add-theme-btn" class="action-button s1-button">Add Theme</button>
+                </div>
+                <div id="s1-themes-list" class="space-y-2"></div>
+            </div>
+            
+            <div class="input-group">
+                <h3 class="subsection-title" style="color: var(--s1-accent);">Bottom-Up Idea Capture</h3>
+                <div class="flex items-center mb-2">
+                    <input type="text" id="s1-new-bottom-up-idea" class="input-field flex-grow mr-2" placeholder="Capture a bottom-up idea/pain point (Press Enter to Add)...">
+                    <button id="s1-add-bottom-up-idea-btn" class="action-button s1-button">Add Idea</button>
+                </div>
+                <div id="s1-bottom-up-ideas-list" class="space-y-2"></div>
+            </div>
+
+            <div class="input-group">
+                <h3 class="subsection-title" style="color: var(--s1-accent);">Capability Assessment</h3>
+                <p class="label-hint">Rate client's current capabilities (1=Low, 5=High). This informs feasibility of themes/use cases.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 mb-4">
+                    <div><label for="s1-cap-data">Data Maturity & Governance:</label><input type="number" id="s1-cap-data" class="input-field !mb-0" min="1" max="5" placeholder="1-5"></div>
+                    <div><label for="s1-cap-tech">Tech Stack & Infrastructure:</label><input type="number" id="s1-cap-tech" class="input-field !mb-0" min="1" max="5" placeholder="1-5"></div>
+                    <div><label for="s1-cap-talent">Talent/Skills & AI Literacy:</label><input type="number" id="s1-cap-talent" class="input-field !mb-0" min="1" max="5" placeholder="1-5"></div>
+                    <div><label for="s1-cap-process">Agile Processes & Change Readiness:</label><input type="number" id="s1-cap-process" class="input-field !mb-0" min="1" max="5" placeholder="1-5"></div>
+                    <div class="sm:col-span-2"><label for="s1-cap-ethics">Ethical Frameworks & RAI Governance:</label><input type="number" id="s1-cap-ethics" class="input-field !mb-0" min="1" max="5" placeholder="1-5"></div>
+                </div>
+                <button id="s1-update-capability-chart-btn" class="action-button s1-button mb-4">Update Assessment Chart</button>
+                <div class="chart-container" style="max-height: 350px;">
+                    <canvas id="s1CapabilityChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <h3 class="subsection-title" style="color: var(--s1-accent);">Stakeholder Communication & Change Management</h3>
+                <label for="s1-stakeholder-groups">Key Stakeholder Groups (comma-separated):</label>
+                <input type="text" id="s1-stakeholder-groups" class="input-field" placeholder="e.g., Executives, IT Department, Employees, Customers, Investors">
+                <label for="s1-communication-strategy" class="mt-2">Communication Strategy & Narrative Points:</label>
+                <textarea id="s1-communication-strategy" class="input-field" placeholder="Tailored messages, positive narrative (AI augments humans), channels, cadence..."></textarea>
+                <label class="mt-2">Change Management (ADKAR Model) Considerations:</label>
+                <div class="checkbox-group space-x-4">
+                    <label><input type="checkbox" id="s1-adkar-awareness"> Awareness</label>
+                    <label><input type="checkbox" id="s1-adkar-desire"> Desire</label>
+                    <label><input type="checkbox" id="s1-adkar-knowledge"> Knowledge</label>
+                    <label><input type="checkbox" id="s1-adkar-ability"> Ability</label>
+                    <label><input type="checkbox" id="s1-adkar-reinforcement"> Reinforcement</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <h3 class="subsection-title" style="color: var(--s1-accent);">Foundational AI Vision Elements & Responsible AI</h3>
+                <div class="mb-2 checkbox-group"><label><input type="checkbox" id="s1-leadership-commitment"> Strong Leadership Commitment & Championship Secured</label></div>
+                <div class="mb-2 checkbox-group"><label><input type="checkbox" id="s1-ai-culture-plan"> Plan for AI-Ready Culture & AI Literacy in place</label></div>
+                <label for="s1-initial-ethical-guardrails">Initial Ethical Guardrails / Responsible AI Principles:</label>
+                <textarea id="s1-initial-ethical-guardrails" class="input-field" placeholder="Notes on Fairness, Transparency, Accountability, Privacy, Security, Inclusivity for client's context..."></textarea>
+                <label for="s1-uncertainty-learning" class="mt-2">Approach to Navigating Uncertainty & Fostering Organizational Learning:</label>
+                <textarea id="s1-uncertainty-learning" class="input-field" placeholder="e.g., Phased rollouts, 'small t' transformations, experimentation budget, knowledge sharing platforms..."></textarea>
+            </div>
+        </section>
+
+        <section id="content-prioritize" class="section-content" style="background-color: var(--s2-bg-light);">
+            <h2 class="main-section-title" style="color: var(--s2-primary); border-color: var(--s2-primary);">2. Prioritize Use Cases</h2>
+            <p class="mb-6" style="color: var(--s2-text-dark);">Translate the AI vision into a portfolio of actionable initiatives. Identify potential applications, then rigorously evaluate and prioritize them based on strategic value, feasibility, and responsible AI principles.</p>
+
+            <button id="s2-open-add-use-case-modal-btn" class="action-button s2-button mb-4">Add New AI Use Case</button>
+            
+            <div id="s2-use-cases-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+
+            <div class="mt-8 input-group">
+                <h3 class="subsection-title" style="color: var(--s2-accent);">Interactive Prioritization Matrix</h3>
+                <p class="label-hint" style="color: var(--s2-text-dark);">Consultant enters summary scores (Value, Feasibility, Actionability) in the Use Case modal after detailed evaluation. Chart updates dynamically.</p>
+                <div class="chart-container">
+                    <canvas id="s2PrioritizationMatrixChart"></canvas>
+                </div>
+            </div>
+             <div class="mt-8 input-group">
+                <h3 class="subsection-title" style="color: var(--s2-accent);">AI Roadmap Notes</h3>
+                <textarea id="s2-roadmap-notes" class="input-field" placeholder="Outline sequencing of prioritized use cases, dependencies, overall roadmap narrative..."></textarea>
+            </div>
+        </section>
+
+        <section id="content-measure" class="section-content" style="background-color: var(--s3-bg-light);">
+            <h2 class="main-section-title" style="color: var(--s3-primary); border-color: var(--s3-primary);">3. Measure Results</h2>
+            <p class="mb-6" style="color: var(--s3-text-dark);">Define and track KPIs for prioritized use cases to demonstrate value, justify investment, and drive continuous improvement. Ensure measurement incorporates Responsible AI considerations.</p>
+
+            <div class="input-group">
+                <h3 class="subsection-title" style="color: var(--s3-accent);">Define KPIs for Prioritized Use Cases</h3>
+                <select id="s3-kpi-use-case-select" class="input-field mb-2">
+                    <option value="">Select a Prioritized Use Case to define KPIs for...</option>
+                </select>
+                <button id="s3-open-add-kpi-modal-btn" class="action-button s3-button mb-4" disabled>Add KPI for Selected Use Case</button>
+                <div id="s3-kpis-list" class="space-y-3">
+                    </div>
+            </div>
+
+            <div class="mt-8 input-group">
+                <h3 class="subsection-title" style="color: var(--s3-accent);">KPI Category Distribution</h3>
+                <p class="label-hint" style="color: var(--s3-text-dark);">Distribution of defined KPIs. Updates as you add KPIs.</p>
+                <div class="chart-container" style="max-height: 300px;">
+                    <canvas id="s3KpiCategoriesChart"></canvas>
+                </div>
+            </div>
+            <div class="mt-8 input-group">
+                <h3 class="subsection-title" style="color: var(--s3-accent);">ROI & Value Communication Notes (per Use Case context)</h3>
+                <textarea id="s3-roi-notes" class="input-field" placeholder="Notes on estimated investment, tangible/intangible benefits, and how to communicate ROI for selected use cases..."></textarea>
+            </div>
+            <div class="mt-8 input-group">
+                <h3 class="subsection-title" style="color: var(--s3-accent);">Ethical Oversight & Governance in Measurement</h3>
+                <textarea id="s3-ethical-notes" class="input-field" placeholder="Notes on ongoing AI ethics board involvement, bias review processes, transparency reporting for deployed solutions..."></textarea>
+            </div>
+        </section>
+    </main>
+
+    <div id="s1-priority-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><span class="close-button" onclick="closeModal('s1-priority-modal')">&times;</span><h3 id="s1-priority-modal-title" class="modal-title">Edit Strategic Priority</h3></div>
+            <form id="s1-priority-form">
+                <input type="hidden" id="s1-priority-id-edit">
+                <div><label for="s1-priority-text-edit">Strategic Priority Text:</label><input type="text" id="s1-priority-text-edit" class="input-field" required></div>
+                <div class="mt-3"><label for="s1-priority-smart-goal-edit">Associated SMART Goal(s):</label><textarea id="s1-priority-smart-goal-edit" class="input-field" placeholder="e.g., Reduce call handling by 15% in 12 months..."></textarea></div>
+                <div class="mt-3"><label for="s1-priority-outcomes-edit">Desired Business Outcomes:</label><textarea id="s1-priority-outcomes-edit" class="input-field" placeholder="e.g., Improved CSAT, cost reduction, new revenue stream..."></textarea></div>
+                <button type="submit" class="action-button s1-button mt-4">Save Priority</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="s1-theme-modal" class="modal">
+        <div class="modal-content">
+             <div class="modal-header"><span class="close-button" onclick="closeModal('s1-theme-modal')">&times;</span><h3 id="s1-theme-modal-title" class="modal-title">Edit AI Theme/Domain</h3></div>
+            <form id="s1-theme-form">
+                <input type="hidden" id="s1-theme-id-edit">
+                <input type="hidden" id="s1-theme-priority-id-ref-edit">
+                <div><label for="s1-theme-text-edit">AI Theme/Domain Text:</label><input type="text" id="s1-theme-text-edit" class="input-field" required></div>
+                <div class="mt-3"><label for="s1-theme-enables-edit">How this theme enables business objectives:</label><textarea id="s1-theme-enables-edit" class="input-field" placeholder="e.g., AI-Powered Personalization enables 'Enhance Customer Loyalty' by..."></textarea></div>
+                <button type="submit" class="action-button s1-button mt-4">Save Theme</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="s2-use-case-modal" class="modal">
+        <div class="modal-content" style="color: var(--s2-text-dark);">
+            <div class="modal-header">
+                <span id="s2-close-use-case-modal-btn" class="close-button">&times;</span>
+                <h3 id="s2-use-case-modal-title" class="modal-title s2-text-primary">Add New AI Use Case</h3>
+            </div>
+            <form id="s2-use-case-form" class="space-y-3">
+                <input type="hidden" id="s2-use-case-id">
+                
+                <h4 class="modal-section-title s2-text-accent">Basic Information</h4>
+                <div><label for="s2-use-case-name">Use Case Name/Description:</label><input type="text" id="s2-use-case-name" class="input-field" required></div>
+                <div><label for="s2-use-case-theme-select">Link to AI Theme/Domain:</label>
+                    <select id="s2-use-case-theme-select" class="input-field" required><option value="">-- Select AI Theme --</option></select>
+                </div>
+                <div><label for="s2-use-case-source">Source of Idea:</label><input type="text" id="s2-use-case-source" class="input-field" placeholder="e.g., Bottom-Up Workshop, Leadership Directive..."></div>
+
+                <h4 class="modal-section-title s2-text-accent">Business Value Assessment</h4>
+                <div><label for="s2-uc-val-impact">Impact on Customer/Employee Needs:</label><textarea id="s2-uc-val-impact" class="input-field"></textarea></div>
+                <div><label for="s2-uc-val-align">Strategic Alignment (to AI Vision & Biz Objectives):</label><textarea id="s2-uc-val-align" class="input-field"></textarea></div>
+                <div><label for="s2-uc-val-reuse">Reusability/Extensibility Potential:</label><textarea id="s2-uc-val-reuse" class="input-field"></textarea></div>
+                <div><label for="s2-uc-val-econ">Estimated Economic Value (Revenue/Cost/Efficiency):</label><textarea id="s2-uc-val-econ" class="input-field"></textarea></div>
+                <div><label for="s2-use-case-value">Overall Business Value Score (1-10 for chart):</label><input type="number" id="s2-use-case-value" class="input-field" min="1" max="10" step="0.5" required></div>
+
+                <h4 class="modal-section-title s2-text-accent">Actionability & Technical Feasibility Assessment</h4>
+                <div><label for="s2-uc-act-accuracy">Required AI Accuracy/Performance:</label><textarea id="s2-uc-act-accuracy" class="input-field"></textarea></div>
+                <div><label for="s2-uc-act-adoption">Adoption & Change Management Considerations:</label><textarea id="s2-uc-act-adoption" class="input-field"></textarea></div>
+                <div><label for="s2-uc-act-speed">Estimated Speed to Value:</label><textarea id="s2-uc-act-speed" class="input-field"></textarea></div>
+                <div><label for="s2-uc-feas-techfit">Technical Fit (Is AI best solution?):</label><textarea id="s2-uc-feas-techfit" class="input-field"></textarea></div>
+                <div><label for="s2-uc-feas-tractability">Problem Tractability with Current AI:</label><textarea id="s2-uc-feas-tractability" class="input-field"></textarea></div>
+                <div><label for="s2-use-case-feasibility">Overall Feasibility Score (1-10 for chart):</label><input type="number" id="s2-use-case-feasibility" class="input-field" min="1" max="10" step="0.5" required></div>
+                
+                <h4 class="modal-section-title s2-text-accent">Data Readiness Assessment</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="col-span-1"><input type="checkbox" id="s2-uc-data-available"> Data Available</label>
+                    <select id="s2-uc-data-quality" class="input-field col-span-1"><option value="">Data Quality?</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
+                </div>
+                <div><label for="s2-uc-data-notes">Data Accessibility, Relevance, Governance Notes:</label><textarea id="s2-uc-data-notes" class="input-field"></textarea></div>
+
+                <h4 class="modal-section-title s2-text-accent">Responsible AI & Risk Assessment</h4>
+                <div><label for="s2-uc-risk-bias">Potential for Bias & Fairness Concerns:</label><textarea id="s2-uc-risk-bias" class="input-field"></textarea></div>
+                <div><label for="s2-uc-risk-explain">Transparency & Explainability Needs:</label><textarea id="s2-uc-risk-explain" class="input-field"></textarea></div>
+                <div><label for="s2-uc-risk-privacy">Privacy & Security Considerations:</label><textarea id="s2-uc-risk-privacy" class="input-field"></textarea></div>
+                <div><label for="s2-uc-risk-account">Accountability & Human Oversight Needs:</label><textarea id="s2-uc-risk-account" class="input-field"></textarea></div>
+                <div><label for="s2-uc-risk-level">Overall Ethical Risk Level:</label>
+                    <select id="s2-uc-risk-level" class="input-field"><option value="">Select Risk</option><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option></select>
+                </div>
+
+                <h4 class="modal-section-title s2-text-accent">Other Key Criteria & Actionability Score</h4>
+                <div><label for="s2-uc-other-scale">Scalability Considerations:</label><textarea id="s2-uc-other-scale" class="input-field"></textarea></div>
+                <div><label for="s2-uc-other-talent">Talent & Resource Requirements/Gaps:</label><textarea id="s2-uc-other-talent" class="input-field"></textarea></div>
+                <div><label for="s2-uc-other-integrate">Integration Complexity:</label><textarea id="s2-uc-other-integrate" class="input-field"></textarea></div>
+                <div><label for="s2-use-case-actionability">Overall Actionability Score (1-10 for chart bubble size):</label><input type="number" id="s2-use-case-actionability" class="input-field" min="1" max="10" step="0.5" required></div>
+
+                <h4 class="modal-section-title s2-text-accent">Use Case Status & Timeline</h4>
+                 <div><label for="s2-use-case-status">Status:</label>
+                    <select id="s2-use-case-status" class="input-field">
+                        <option value="Ideation">Ideation</option><option value="Evaluation">Evaluation</option><option value="Prioritized">Prioritized</option><option value="Development">In Development</option><option value="Deployed">Deployed</option><option value="On Hold">On Hold</option>
+                    </select>
+                </div>
+                 <div><label for="s2-use-case-timeline">Time Horizon:</label>
+                    <select id="s2-use-case-timeline" class="input-field">
+                        <option value="Short-term">Short-term / Quick Win</option><option value="Medium-term">Medium-term</option><option value="Long-term">Long-term / Strategic Bet</option>
+                    </select>
+                </div>
+                <div class="mt-3"><label for="s2-use-case-notes-summary">General Notes for this Use Case:</label><textarea id="s2-use-case-notes-summary" class="input-field" placeholder="Overall summary, key assumptions, risks..."></textarea></div>
+
+                <button type="submit" id="s2-save-use-case-btn" class="action-button s2-button mt-4">Save Use Case</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="s3-kpi-modal" class="modal">
+        <div class="modal-content" style="color: var(--s3-text-dark);">
+            <div class="modal-header">
+                <span id="s3-close-kpi-modal-btn" class="close-button">&times;</span>
+                <h3 id="s3-kpi-modal-title" class="modal-title s3-text-primary">Add New KPI</h3>
+            </div>
+            <form id="s3-kpi-form" class="space-y-3">
+                <input type="hidden" id="s3-kpi-id">
+                <input type="hidden" id="s3-kpi-use-case-ref-id">
+                <div><label for="s3-kpi-name">KPI Name:</label><input type="text" id="s3-kpi-name" class="input-field" required></div>
+                <div><label for="s3-kpi-description">Description:</label><textarea id="s3-kpi-description" class="input-field"></textarea></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div><label for="s3-kpi-baseline">Baseline Value:</label><input type="text" id="s3-kpi-baseline" class="input-field"></div>
+                    <div><label for="s3-kpi-target">Target Value:</label><input type="text" id="s3-kpi-target" class="input-field"></div>
+                </div>
+                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div><label for="s3-kpi-actual">Actual Value (for tracking):</label><input type="text" id="s3-kpi-actual" class="input-field"></div>
+                    <div><label for="s3-kpi-unit">Unit of Measurement:</label><input type="text" id="s3-kpi-unit" class="input-field" placeholder="e.g., %, $, hours"></div>
+                </div>
+                <div><label for="s3-kpi-category">Category:</label>
+                    <select id="s3-kpi-category" class="input-field" required>
+                        <option value="Model Quality">Model Quality (e.g., Accuracy, F1)</option>
+                        <option value="System Metrics">System Metrics (e.g., Latency, Uptime)</option>
+                        <option value="Adoption Metrics">Adoption Metrics (e.g., DAU, Task Completion)</option>
+                        <option value="Operational Metrics">Operational Metrics (e.g., Cycle Time, Cost/Task)</option>
+                        <option value="Business Impact">Business Impact (e.g., Revenue, CSAT)</option>
+                        <option value="Risk & Governance">Risk & Governance (e.g., Compliance Rate, Bias Reduction)</option>
+                    </select>
+                </div>
+                 <div><label for="s3-kpi-type">KPI Type (MIT Sloan "Smart KPIs"):</label>
+                    <select id="s3-kpi-type" class="input-field">
+                        <option value="Standard">Standard KPI</option>
+                        <option value="Smart Descriptive">Smart Descriptive (AI-enhanced insight)</option>
+                        <option value="Smart Predictive">Smart Predictive (AI-forecasted)</option>
+                        <option value="Smart Prescriptive">Smart Prescriptive (AI-recommended action)</option>
+                    </select>
+                </div>
+                <div><label for="s3-kpi-link-value">Link to Business Value / Strategic Objective:</label><textarea id="s3-kpi-link-value" class="input-field" placeholder="Explain how this KPI demonstrates value..."></textarea></div>
+                <div><label for="s3-kpi-monitor-method">Data Collection & Monitoring Methodology:</label><textarea id="s3-kpi-monitor-method" class="input-field" placeholder="How will this KPI be tracked? Source of data? Frequency?"></textarea></div>
+                <button type="submit" id="s3-save-kpi-btn" class="action-button s3-button mt-4">Save KPI</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast-notification"></div>
+
+    <script>
+    // --- Global State & Utility Functions ---
+    let clientData = {
+        vision: {
+            corporateStrategy: '',
+            aiAmbition: '',
+            visionMethodology: '',
+            strategicPriorities: [], // {id, text, smartGoal, outcomes, themes:[{id, text, enables}]}
+            bottomUpIdeas: [], // {id, text}
+            capabilities: { data: 0, tech: 0, talent: 0, process: 0, ethics: 0 },
+            stakeholderGroups: '',
+            communicationStrategy: '',
+            adkar: { awareness: false, desire: false, knowledge: false, ability: false, reinforcement: false },
+            leadershipCommitment: false,
+            aiCulturePlan: false,
+            initialEthicalGuardrails: '',
+            uncertaintyLearning: ''
+        },
+        prioritize: {
+            useCases: [], // {id, name, themeId, source, valueDetails:{...}, feasibilityDetails:{...}, dataReadiness:{...}, raiDetails:{...}, otherCriteria:{...}, summaryScores:{value,feasibility,actionability}, status, timeline, notesSummary}
+            roadmapNotes: ''
+        },
+        measure: {
+            kpis: [], // {id, useCaseId, name, description, baseline, target, actual, unit, category, kpiType, linkValue, monitorMethod}
+            roiNotes: '',
+            ethicalNotes: ''
+        }
+    };
+
+    const LS_KEY = 'aiStrategyCoPilotData_v3';
+    let s1CapabilityChartInstance, s2PrioritizationMatrixChartInstance, s3KpiCategoriesChartInstance;
+
+    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+    function showToast(message) {
+        const toast = document.getElementById('toast-notification');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
+    function wrapLabels(label, maxWidth = 16) { if (typeof label === 'string' && label.length > maxWidth) { const words = label.split(' '); let lines = []; let currentLine = ''; words.forEach(word => { if ((currentLine + word).length > maxWidth && currentLine) { lines.push(currentLine.trim()); currentLine = word + ' '; } else { currentLine += word + ' '; } }); lines.push(currentLine.trim()); return lines; } return label; }
+    const tooltipTitleCallback = { callbacks: { title: function(tooltipItems) { const item = tooltipItems[0]; if (!item || !item.chart || !item.chart.data || !item.chart.data.labels || item.dataIndex === undefined || item.dataIndex >= item.chart.data.labels.length) return ''; let label = item.chart.data.labels[item.dataIndex]; return Array.isArray(label) ? label.join(' ') : String(label); } } };
+
+    // --- Data Persistence ---
+    document.getElementById('saveDataButton').addEventListener('click', () => {
+        // Capture all current form values into clientData before saving
+        // Section 1
+        clientData.vision.corporateStrategy = document.getElementById('s1-corporate-strategy').value;
+        clientData.vision.aiAmbition = document.getElementById('s1-ai-ambition').value;
+        clientData.vision.visionMethodology = document.getElementById('s1-vision-methodology').value;
+        clientData.vision.capabilities.data = parseInt(document.getElementById('s1-cap-data').value) || 0;
+        clientData.vision.capabilities.tech = parseInt(document.getElementById('s1-cap-tech').value) || 0;
+        clientData.vision.capabilities.talent = parseInt(document.getElementById('s1-cap-talent').value) || 0;
+        clientData.vision.capabilities.process = parseInt(document.getElementById('s1-cap-process').value) || 0;
+        clientData.vision.capabilities.ethics = parseInt(document.getElementById('s1-cap-ethics').value) || 0;
+        clientData.vision.stakeholderGroups = document.getElementById('s1-stakeholder-groups').value;
+        clientData.vision.communicationStrategy = document.getElementById('s1-communication-strategy').value;
+        clientData.vision.adkar.awareness = document.getElementById('s1-adkar-awareness').checked;
+        clientData.vision.adkar.desire = document.getElementById('s1-adkar-desire').checked;
+        clientData.vision.adkar.knowledge = document.getElementById('s1-adkar-knowledge').checked;
+        clientData.vision.adkar.ability = document.getElementById('s1-adkar-ability').checked;
+        clientData.vision.adkar.reinforcement = document.getElementById('s1-adkar-reinforcement').checked;
+        clientData.vision.leadershipCommitment = document.getElementById('s1-leadership-commitment').checked;
+        clientData.vision.aiCulturePlan = document.getElementById('s1-ai-culture-plan').checked;
+        clientData.vision.initialEthicalGuardrails = document.getElementById('s1-initial-ethical-guardrails').value;
+        clientData.vision.uncertaintyLearning = document.getElementById('s1-uncertainty-learning').value;
+        // Section 2
+        clientData.prioritize.roadmapNotes = document.getElementById('s2-roadmap-notes').value;
+        // Section 3
+        clientData.measure.roiNotes = document.getElementById('s3-roi-notes').value;
+        clientData.measure.ethicalNotes = document.getElementById('s3-ethical-notes').value;
+
+        localStorage.setItem(LS_KEY, JSON.stringify(clientData));
+        showToast('Client data saved successfully!');
+    });
+
+    document.getElementById('loadDataButton').addEventListener('click', () => {
+        const savedData = localStorage.getItem(LS_KEY);
+        if (savedData) {
+            clientData = JSON.parse(savedData);
+            // Ensure new nested structures exist if loading older data
+            if (!clientData.vision.adkar) clientData.vision.adkar = { awareness: false, desire: false, knowledge: false, ability: false, reinforcement: false };
+            if (!clientData.vision.bottomUpIdeas) clientData.vision.bottomUpIdeas = [];
+            clientData.vision.strategicPriorities.forEach(p => {
+                if (p.smartGoal === undefined) p.smartGoal = '';
+                if (p.outcomes === undefined) p.outcomes = '';
+                if (p.themes) p.themes.forEach(t => { if(t.enables === undefined) t.enables = ''; }); else p.themes = [];
+            });
+             clientData.prioritize.useCases.forEach(uc => { // Ensure all new nested objects for use cases exist
+                const defaults = { name: '', themeId: '', source: '', valueDetails: {}, feasibilityDetails: {}, dataReadiness: {}, raiDetails: {}, otherCriteria: {}, summaryScores: {value:0, feasibility:0, actionability:1}, status: 'Ideation', timeline: 'Medium-term', notesSummary: ''};
+                for (const key in defaults) { if (uc[key] === undefined) uc[key] = defaults[key]; }
+                const detailObjects = ['valueDetails', 'feasibilityDetails', 'dataReadiness', 'raiDetails', 'otherCriteria'];
+                detailObjects.forEach(objKey => { if(typeof uc[objKey] !== 'object' || uc[objKey] === null) uc[objKey] = {}; });
+                if(typeof uc.summaryScores !== 'object' || uc.summaryScores === null) uc.summaryScores = {value:0, feasibility:0, actionability:1};
+
+            });
+            clientData.measure.kpis.forEach(kpi => { // Ensure new kpi fields exist
+                 const kpiDefaults = { actual: '', kpiType: 'Standard', linkValue: '', monitorMethod: ''};
+                 for (const key in kpiDefaults) { if (kpi[key] === undefined) kpi[key] = kpiDefaults[key]; }
+            });
+
+
+            renderAll();
+            showToast('Client data loaded.');
+        } else {
+            showToast('No saved data found.');
+        }
+    });
+
+    document.getElementById('clearDataButton').addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all client data? This cannot be undone.')) {
+            clientData = {
+                vision: { corporateStrategy: '', aiAmbition: '', visionMethodology: '', strategicPriorities: [], bottomUpIdeas: [], capabilities: {data:0,tech:0,talent:0,process:0,ethics:0}, stakeholderGroups: '', communicationStrategy: '', adkar: {}, leadershipCommitment: false, aiCulturePlan: false, initialEthicalGuardrails: '', uncertaintyLearning: '' },
+                prioritize: { useCases: [], roadmapNotes: '' },
+                measure: { kpis: [], roiNotes: '', ethicalNotes: '' }
+            };
+            localStorage.removeItem(LS_KEY);
+            renderAll();
+            showToast('All client data cleared.');
+        }
+    });
+
+    // --- Tab Navigation ---
+    const tabs = document.querySelectorAll('.section-tab');
+    const contents = document.querySelectorAll('.section-content');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('s1-active', 's2-active', 's3-active'));
+            contents.forEach(c => c.classList.remove('active'));
+            const section = tab.id.split('-')[1];
+            tab.classList.add(`s${['vision', 'prioritize', 'measure'].indexOf(section) + 1}-active`);
+            document.getElementById(`content-${section}`).classList.add('active');
+        });
+    });
+
+    // --- Modals ---
+    function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
+    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+    document.querySelectorAll('.close-button').forEach(btn => btn.onclick = function() { closeModal(btn.closest('.modal').id); });
+    window.onclick = function(event) { if (event.target.classList.contains('modal')) closeModal(event.target.id); }
+
+    // --- Section 1: Vision ---
+    // Elements
+    const s1CorporateStrategyEl = document.getElementById('s1-corporate-strategy');
+    const s1AiAmbitionEl = document.getElementById('s1-ai-ambition');
+    const s1VisionMethodologyEl = document.getElementById('s1-vision-methodology');
+    const s1NewPriorityTextEl = document.getElementById('s1-new-priority-text');
+    const s1AddPriorityBtn = document.getElementById('s1-add-priority-btn');
+    const s1PrioritiesListEl = document.getElementById('s1-priorities-list');
+    const s1ThemePrioritySelectEl = document.getElementById('s1-theme-priority-select');
+    const s1NewThemeTextEl = document.getElementById('s1-new-theme-text');
+    const s1AddThemeBtn = document.getElementById('s1-add-theme-btn');
+    const s1ThemesListEl = document.getElementById('s1-themes-list');
+    const s1NewBottomUpIdeaEl = document.getElementById('s1-new-bottom-up-idea');
+    const s1AddBottomUpIdeaBtn = document.getElementById('s1-add-bottom-up-idea-btn');
+    const s1BottomUpIdeasListEl = document.getElementById('s1-bottom-up-ideas-list');
+    // Priority Modal Elements
+    const s1PriorityModalEl = document.getElementById('s1-priority-modal');
+    const s1PriorityFormEl = document.getElementById('s1-priority-form');
+    let editingS1PriorityId = null;
+    // Theme Modal Elements
+    const s1ThemeModalEl = document.getElementById('s1-theme-modal');
+    const s1ThemeFormEl = document.getElementById('s1-theme-form');
+    let editingS1ThemeId = null;
+    let currentS1ThemePriorityRef = null;
+
+
+    function renderS1Priorities() {
+        s1PrioritiesListEl.innerHTML = '';
+        s1ThemePrioritySelectEl.innerHTML = '<option value="">Select a Strategic Priority...</option>';
+        clientData.vision.strategicPriorities.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 style="color: var(--s1-text-dark);">${p.text}</h4>
+                        <p class="text-xs" style="color: var(--s1-text-dark);"><strong class="detail-label">SMART Goals:</strong> ${p.smartGoal || 'N/A'}</p>
+                        <p class="text-xs" style="color: var(--s1-text-dark);"><strong class="detail-label">Outcomes:</strong> ${p.outcomes || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <button class="action-button edit-button text-xs s1-button mb-1 w-full" data-id="${p.id}">Edit</button>
+                        <button class="action-button delete-button text-xs w-full" data-id="${p.id}">Delete</button>
+                    </div>
+                </div>
+            `;
+            s1PrioritiesListEl.appendChild(card);
+            const option = document.createElement('option');
+            option.value = p.id;
+            option.textContent = p.text;
+            s1ThemePrioritySelectEl.appendChild(option);
+        });
+        renderS1Themes(); 
+    }
+
+    function renderS1Themes() {
+        s1ThemesListEl.innerHTML = '';
+        clientData.vision.strategicPriorities.forEach(p => {
+            if (p.themes && p.themes.length > 0) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'mb-3';
+                groupDiv.innerHTML = `<h5 class="font-medium text-sm mb-1" style="color: var(--s1-text-dark);">Themes for: <strong style="color: var(--s1-primary);">${p.text}</strong></h5>`;
+                p.themes.forEach(t => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card ml-4';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium" style="color: var(--s1-text-dark);">${t.text}</p>
+                                <p class="text-xs" style="color: var(--s1-text-dark);"><strong class="detail-label">Enables:</strong> ${t.enables || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <button class="action-button edit-button text-xs s1-button mb-1 w-full" data-priority-id="${p.id}" data-theme-id="${t.id}">Edit</button>
+                                <button class="action-button delete-button text-xs w-full" data-priority-id="${p.id}" data-theme-id="${t.id}">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                    groupDiv.appendChild(card);
+                });
+                s1ThemesListEl.appendChild(groupDiv);
+            }
+        });
+        renderS2ThemeDropdown();
+    }
+    
+    function renderS1BottomUpIdeas() {
+        s1BottomUpIdeasListEl.innerHTML = '';
+        clientData.vision.bottomUpIdeas.forEach(idea => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <p class="text-sm" style="color: var(--s1-text-dark);">${idea.text}</p>
+                    <button class="action-button delete-button text-xs" data-id="${idea.id}">Delete Idea</button>
+                </div>`;
+            s1BottomUpIdeasListEl.appendChild(card);
+        });
+    }
+
+    // Add/Edit/Delete Strategic Priorities
+    function addS1Priority() {
+        const text = s1NewPriorityTextEl.value.trim();
+        if (text) {
+            clientData.vision.strategicPriorities.push({ id: generateId(), text: text, smartGoal: '', outcomes: '', themes: [] });
+            s1NewPriorityTextEl.value = '';
+            renderS1Priorities();
+        }
+    }
+    s1AddPriorityBtn.addEventListener('click', addS1Priority);
+    s1NewPriorityTextEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addS1Priority(); }});
+
+    s1PrioritiesListEl.addEventListener('click', e => {
+        const target = e.target;
+        const priorityId = target.dataset.id;
+        if (target.classList.contains('delete-button')) {
+            clientData.vision.strategicPriorities = clientData.vision.strategicPriorities.filter(p => p.id !== priorityId);
+            // Cascade delete themes, use cases, KPIs
+            const themesToDelete = clientData.vision.strategicPriorities.find(p => p.id === priorityId)?.themes.map(t => t.id) || [];
+            themesToDelete.forEach(themeId => {
+                clientData.prioritize.useCases = clientData.prioritize.useCases.filter(uc => {
+                    if (uc.themeId === themeId) {
+                        clientData.measure.kpis = clientData.measure.kpis.filter(kpi => kpi.useCaseId !== uc.id);
+                        return false;
+                    }
+                    return true;
+                });
+            });
+            renderS1Priorities();
+        } else if (target.classList.contains('edit-button')) {
+            const priority = clientData.vision.strategicPriorities.find(p => p.id === priorityId);
+            if (priority) {
+                editingS1PriorityId = priorityId;
+                document.getElementById('s1-priority-modal-title').textContent = 'Edit Strategic Priority';
+                document.getElementById('s1-priority-id-edit').value = priority.id;
+                document.getElementById('s1-priority-text-edit').value = priority.text;
+                document.getElementById('s1-priority-smart-goal-edit').value = priority.smartGoal || '';
+                document.getElementById('s1-priority-outcomes-edit').value = priority.outcomes || '';
+                openModal('s1-priority-modal');
+            }
+        }
+    });
+
+    s1PriorityFormEl.addEventListener('submit', e => {
+        e.preventDefault();
+        const priorityId = document.getElementById('s1-priority-id-edit').value;
+        const priority = clientData.vision.strategicPriorities.find(p => p.id === priorityId);
+        if (priority) {
+            priority.text = document.getElementById('s1-priority-text-edit').value.trim();
+            priority.smartGoal = document.getElementById('s1-priority-smart-goal-edit').value.trim();
+            priority.outcomes = document.getElementById('s1-priority-outcomes-edit').value.trim();
+            renderS1Priorities();
+        }
+        closeModal('s1-priority-modal');
+    });
+
+    // Add/Edit/Delete AI Themes
+    function addS1Theme() {
+        const priorityId = s1ThemePrioritySelectEl.value;
+        const themeText = s1NewThemeTextEl.value.trim();
+        if (priorityId && themeText) {
+            const priority = clientData.vision.strategicPriorities.find(p => p.id === priorityId);
+            if (priority) {
+                if (!priority.themes) priority.themes = [];
+                priority.themes.push({ id: generateId(), text: themeText, enables: '' });
+                s1NewThemeTextEl.value = '';
+                renderS1Themes();
+            }
+        } else { showToast('Please select a priority and enter a theme.'); }
+    }
+    s1AddThemeBtn.addEventListener('click', addS1Theme);
+    s1NewThemeTextEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addS1Theme(); }});
+    
+    s1ThemesListEl.addEventListener('click', e => {
+        const target = e.target;
+        const priorityId = target.dataset.priorityId;
+        const themeId = target.dataset.themeId;
+        if (target.classList.contains('delete-button')) {
+            const priority = clientData.vision.strategicPriorities.find(p => p.id === priorityId);
+            if (priority && priority.themes) {
+                priority.themes = priority.themes.filter(t => t.id !== themeId);
+                clientData.prioritize.useCases = clientData.prioritize.useCases.filter(uc => {
+                    if (uc.themeId === themeId) {
+                        clientData.measure.kpis = clientData.measure.kpis.filter(kpi => kpi.useCaseId !== uc.id);
+                        return false;
+                    }
+                    return true;
+                });
+                renderS1Themes();
+            }
+        } else if (target.classList.contains('edit-button')) {
+            const priority = clientData.vision.strategicPriorities.find(p => p.id === priorityId);
+            const theme = priority?.themes.find(t => t.id === themeId);
+            if (theme) {
+                editingS1ThemeId = themeId;
+                currentS1ThemePriorityRef = priorityId;
+                document.getElementById('s1-theme-modal-title').textContent = 'Edit AI Theme/Domain';
+                document.getElementById('s1-theme-id-edit').value = theme.id;
+                document.getElementById('s1-theme-priority-id-ref-edit').value = priorityId;
+                document.getElementById('s1-theme-text-edit').value = theme.text;
+                document.getElementById('s1-theme-enables-edit').value = theme.enables || '';
+                openModal('s1-theme-modal');
+            }
+        }
+    });
+
+    s1ThemeFormEl.addEventListener('submit', e => {
+        e.preventDefault();
+        const themeId = document.getElementById('s1-theme-id-edit').value;
+        const priorityId = document.getElementById('s1-theme-priority-id-ref-edit').value;
+        const priority = clientData.vision.strategicPriorities.find(p => p.id === priorityId);
+        const theme = priority?.themes.find(t => t.id === themeId);
+        if (theme) {
+            theme.text = document.getElementById('s1-theme-text-edit').value.trim();
+            theme.enables = document.getElementById('s1-theme-enables-edit').value.trim();
+            renderS1Themes();
+        }
+        closeModal('s1-theme-modal');
+    });
+
+    // Add/Delete Bottom-Up Ideas
+    function addS1BottomUpIdea() {
+        const text = s1NewBottomUpIdeaEl.value.trim();
+        if (text) {
+            clientData.vision.bottomUpIdeas.push({ id: generateId(), text: text });
+            s1NewBottomUpIdeaEl.value = '';
+            renderS1BottomUpIdeas();
+        }
+    }
+    s1AddBottomUpIdeaBtn.addEventListener('click', addS1BottomUpIdea);
+    s1NewBottomUpIdeaEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addS1BottomUpIdea(); }});
+    s1BottomUpIdeasListEl.addEventListener('click', e => {
+        if (e.target.classList.contains('delete-button')) {
+            const id = e.target.dataset.id;
+            clientData.vision.bottomUpIdeas = clientData.vision.bottomUpIdeas.filter(idea => idea.id !== id);
+            renderS1BottomUpIdeas();
+        }
+    });
+    
+    // Capability Chart
+    function renderS1CapabilityChart() {
+        const caps = clientData.vision.capabilities;
+        const data = {
+            labels: ['Data Maturity & Gov.', 'Tech Stack & Infra.', 'Talent & AI Literacy', 'Agile Processes', 'RAI Gov. & Ethics'],
+            datasets: [{
+                label: 'Client Capabilities Assessment (1-5)',
+                data: [caps.data, caps.tech, caps.talent, caps.process, caps.ethics],
+                backgroundColor: 'rgba(255, 165, 0, 0.3)', 
+                borderColor: 'var(--s1-primary)',
+                pointBackgroundColor: 'var(--s1-primary)',
+            }]
+        };
+        const config = { type: 'radar', data: data, options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 5, pointLabels: { font: {size: 9}, color: 'var(--s1-text-dark)'}, ticks: {stepSize:1, backdropColor: 'transparent', color: 'var(--s1-text-dark)'} } }, plugins: { legend: {labels: {color: 'var(--s1-text-dark)'}} } } };
+        if (s1CapabilityChartInstance) s1CapabilityChartInstance.destroy();
+        s1CapabilityChartInstance = new Chart(document.getElementById('s1CapabilityChart').getContext('2d'), config);
+    }
+    document.getElementById('s1-update-capability-chart-btn').addEventListener('click', () => {
+         clientData.vision.capabilities.data = parseInt(document.getElementById('s1-cap-data').value) || 0;
+         clientData.vision.capabilities.tech = parseInt(document.getElementById('s1-cap-tech').value) || 0;
+         clientData.vision.capabilities.talent = parseInt(document.getElementById('s1-cap-talent').value) || 0;
+         clientData.vision.capabilities.process = parseInt(document.getElementById('s1-cap-process').value) || 0;
+         clientData.vision.capabilities.ethics = parseInt(document.getElementById('s1-cap-ethics').value) || 0;
+         renderS1CapabilityChart();
+    });
+
+
+    // --- Section 2: Prioritize Use Cases ---
+    const s2UseCaseModalEl = document.getElementById('s2-use-case-modal');
+    const s2UseCaseFormEl = document.getElementById('s2-use-case-form');
+    const s2UseCasesListEl = document.getElementById('s2-use-cases-list');
+    const s2UseCaseThemeSelectEl = document.getElementById('s2-use-case-theme-select');
+    let editingUseCaseId = null;
+
+    function renderS2ThemeDropdown() {
+        s2UseCaseThemeSelectEl.innerHTML = '<option value="">-- Select AI Theme --</option>';
+        clientData.vision.strategicPriorities.forEach(p => {
+            if (p.themes && p.themes.length > 0) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = `Priority: ${p.text}`;
+                p.themes.forEach(t => {
+                    const option = document.createElement('option');
+                    option.value = t.id;
+                    option.textContent = t.text;
+                    optgroup.appendChild(option);
+                });
+                s2UseCaseThemeSelectEl.appendChild(optgroup);
+            }
+        });
+    }
+        
+    function renderS2UseCases() {
+        s2UseCasesListEl.innerHTML = '';
+        clientData.prioritize.useCases.forEach(uc => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            let themeText = 'N/A';
+            let themeFound = false;
+            clientData.vision.strategicPriorities.forEach(p => {
+                if(p.themes){
+                    const foundTheme = p.themes.find(t => t.id === uc.themeId);
+                    if (foundTheme) { themeText = foundTheme.text; themeFound = true; }
+                }
+            });
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 style="color: var(--s2-text-dark);">${uc.name} <span class="text-xs font-normal">(${uc.status || 'Ideation'})</span></h4>
+                        <p><strong class="detail-label">Theme:</strong> <span style="color: ${themeFound ? 'var(--s2-text-dark)' : 'red'};">${themeText}</span></p>
+                        <p><strong class="detail-label">Value:</strong> ${uc.summaryScores.value} | <strong class="detail-label">Feasibility:</strong> ${uc.summaryScores.feasibility} | <strong class="detail-label">Actionability:</strong> ${uc.summaryScores.actionability}</p>
+                        <p><strong class="detail-label">Timeline:</strong> ${uc.timeline || 'N/A'}</p>
+                        <p><strong class="detail-label">Ethical Risk:</strong> ${uc.raiDetails.riskLevel || 'N/A'}</p>
+                        ${uc.notesSummary ? `<p><strong class="detail-label">Notes:</strong> ${uc.notesSummary.substring(0,100)}...</p>` : ''}
+                    </div>
+                    <div>
+                        <button class="action-button edit-button text-xs s2-button mb-1 w-full" data-id="${uc.id}">View/Edit Details</button>
+                        <button class="action-button delete-button text-xs w-full" data-id="${uc.id}">Delete</button>
+                    </div>
+                </div>
+            `;
+            s2UseCasesListEl.appendChild(card);
+        });
+        renderS2PrioritizationMatrixChart();
+        renderS3UseCaseDropdown(); 
+    }
+
+    document.getElementById('s2-open-add-use-case-modal-btn').addEventListener('click', () => {
+        editingUseCaseId = null;
+        document.getElementById('s2-use-case-modal-title').textContent = 'Add New AI Use Case';
+        s2UseCaseFormEl.reset();
+        document.getElementById('s2-use-case-id').value = ''; // Clear hidden ID field
+        renderS2ThemeDropdown(); 
+        openModal('s2-use-case-modal');
+    });
+    document.getElementById('s2-close-use-case-modal-btn').addEventListener('click', () => closeModal('s2-use-case-modal'));
+
+    s2UseCaseFormEl.addEventListener('submit', e => {
+        e.preventDefault();
+        if (!document.getElementById('s2-use-case-theme-select').value) {
+            showToast('Please link this use case to an AI Theme.');
+            return;
+        }
+        const useCaseData = {
+            id: editingUseCaseId || generateId(),
+            name: document.getElementById('s2-use-case-name').value.trim(),
+            themeId: document.getElementById('s2-use-case-theme-select').value,
+            source: document.getElementById('s2-use-case-source').value.trim(),
+            valueDetails: {
+                impact: document.getElementById('s2-uc-val-impact').value.trim(),
+                alignment: document.getElementById('s2-uc-val-align').value.trim(),
+                reuse: document.getElementById('s2-uc-val-reuse').value.trim(),
+                econ: document.getElementById('s2-uc-val-econ').value.trim(),
+            },
+            feasibilityDetails: {
+                accuracy: document.getElementById('s2-uc-act-accuracy').value.trim(),
+                adoption: document.getElementById('s2-uc-act-adoption').value.trim(),
+                speed: document.getElementById('s2-uc-act-speed').value.trim(),
+                techFit: document.getElementById('s2-uc-feas-techfit').value.trim(),
+                tractability: document.getElementById('s2-uc-feas-tractability').value.trim(),
+            },
+            dataReadiness: {
+                available: document.getElementById('s2-uc-data-available').checked,
+                quality: document.getElementById('s2-uc-data-quality').value,
+                notes: document.getElementById('s2-uc-data-notes').value.trim(),
+            },
+            raiDetails: {
+                bias: document.getElementById('s2-uc-risk-bias').value.trim(),
+                explain: document.getElementById('s2-uc-risk-explain').value.trim(),
+                privacy: document.getElementById('s2-uc-risk-privacy').value.trim(),
+                account: document.getElementById('s2-uc-risk-account').value.trim(),
+                riskLevel: document.getElementById('s2-uc-risk-level').value,
+            },
+            otherCriteria: {
+                scale: document.getElementById('s2-uc-other-scale').value.trim(),
+                talent: document.getElementById('s2-uc-other-talent').value.trim(),
+                integrate: document.getElementById('s2-uc-other-integrate').value.trim(),
+            },
+            summaryScores: {
+                value: parseFloat(document.getElementById('s2-use-case-value').value) || 0,
+                feasibility: parseFloat(document.getElementById('s2-use-case-feasibility').value) || 0,
+                actionability: parseFloat(document.getElementById('s2-use-case-actionability').value) || 1,
+            },
+            status: document.getElementById('s2-use-case-status').value,
+            timeline: document.getElementById('s2-use-case-timeline').value,
+            notesSummary: document.getElementById('s2-use-case-notes-summary').value.trim(),
+        };
+
+        if (editingUseCaseId) {
+            const index = clientData.prioritize.useCases.findIndex(uc => uc.id === editingUseCaseId);
+            if (index > -1) clientData.prioritize.useCases[index] = useCaseData;
+        } else {
+            clientData.prioritize.useCases.push(useCaseData);
+        }
+        renderS2UseCases();
+        closeModal('s2-use-case-modal');
+    });
+
+    s2UseCasesListEl.addEventListener('click', e => {
+        const target = e.target.closest('button'); // Get the button itself
+        if (!target) return;
+
+        const id = target.dataset.id;
+        if (target.classList.contains('delete-button')) {
+            clientData.prioritize.useCases = clientData.prioritize.useCases.filter(uc => uc.id !== id);
+            clientData.measure.kpis = clientData.measure.kpis.filter(kpi => kpi.useCaseId !== id);
+            renderS2UseCases();
+        } else if (target.classList.contains('edit-button')) {
+            const uc = clientData.prioritize.useCases.find(uc => uc.id === id);
+            if (uc) {
+                editingUseCaseId = id;
+                document.getElementById('s2-use-case-modal-title').textContent = 'Edit AI Use Case Details';
+                document.getElementById('s2-use-case-id').value = uc.id;
+                document.getElementById('s2-use-case-name').value = uc.name;
+                renderS2ThemeDropdown(); 
+                document.getElementById('s2-use-case-theme-select').value = uc.themeId;
+                document.getElementById('s2-use-case-source').value = uc.source || '';
+                // Populate all detailed fields
+                document.getElementById('s2-uc-val-impact').value = uc.valueDetails.impact || '';
+                document.getElementById('s2-uc-val-align').value = uc.valueDetails.alignment || '';
+                document.getElementById('s2-uc-val-reuse').value = uc.valueDetails.reuse || '';
+                document.getElementById('s2-uc-val-econ').value = uc.valueDetails.econ || '';
+                document.getElementById('s2-use-case-value').value = uc.summaryScores.value;
+                document.getElementById('s2-uc-act-accuracy').value = uc.feasibilityDetails.accuracy || '';
+                document.getElementById('s2-uc-act-adoption').value = uc.feasibilityDetails.adoption || '';
+                document.getElementById('s2-uc-act-speed').value = uc.feasibilityDetails.speed || '';
+                document.getElementById('s2-uc-feas-techfit').value = uc.feasibilityDetails.techFit || '';
+                document.getElementById('s2-uc-feas-tractability').value = uc.feasibilityDetails.tractability || '';
+                document.getElementById('s2-use-case-feasibility').value = uc.summaryScores.feasibility;
+                document.getElementById('s2-uc-data-available').checked = uc.dataReadiness.available || false;
+                document.getElementById('s2-uc-data-quality').value = uc.dataReadiness.quality || '';
+                document.getElementById('s2-uc-data-notes').value = uc.dataReadiness.notes || '';
+                document.getElementById('s2-uc-risk-bias').value = uc.raiDetails.bias || '';
+                document.getElementById('s2-uc-risk-explain').value = uc.raiDetails.explain || '';
+                document.getElementById('s2-uc-risk-privacy').value = uc.raiDetails.privacy || '';
+                document.getElementById('s2-uc-risk-account').value = uc.raiDetails.account || '';
+                document.getElementById('s2-uc-risk-level').value = uc.raiDetails.riskLevel || '';
+                document.getElementById('s2-uc-other-scale').value = uc.otherCriteria.scale || '';
+                document.getElementById('s2-uc-other-talent').value = uc.otherCriteria.talent || '';
+                document.getElementById('s2-uc-other-integrate').value = uc.otherCriteria.integrate || '';
+                document.getElementById('s2-use-case-actionability').value = uc.summaryScores.actionability;
+                document.getElementById('s2-use-case-status').value = uc.status || 'Ideation';
+                document.getElementById('s2-use-case-timeline').value = uc.timeline || 'Medium-term';
+                document.getElementById('s2-use-case-notes-summary').value = uc.notesSummary || '';
+                openModal('s2-use-case-modal');
+            }
+        }
+    });
+
+    function renderS2PrioritizationMatrixChart() {
+        const datasets = clientData.prioritize.useCases.map(uc => ({
+            label: uc.name,
+            data: [{ x: uc.summaryScores.feasibility, y: uc.summaryScores.value, r: uc.summaryScores.actionability * 2 + 5 }], 
+            backgroundColor: uc.raiDetails.riskLevel === 'High' ? 'rgba(255, 99, 132, 0.5)' : (uc.raiDetails.riskLevel === 'Medium' ? 'rgba(255, 206, 86, 0.5)' : 'rgba(75, 192, 192, 0.5)'),
+            borderColor: uc.raiDetails.riskLevel === 'High' ? 'rgb(255, 99, 132)' : (uc.raiDetails.riskLevel === 'Medium' ? 'rgb(255, 206, 86)' : 'rgb(75, 192, 192)'),
+        }));
+        const data = { datasets: datasets };
+        const config = { type: 'bubble', data: data, options: { responsive: true, maintainAspectRatio: false, scales: { x: { title: { display: true, text: 'Feasibility Score (1-10)', color: 'var(--s2-text-dark)'}, min: 0, max: 10, ticks:{color:'var(--s2-text-dark)'}, grid:{color:'var(--s2-border)'} }, y: { title: { display: true, text: 'Business Value Score (1-10)', color: 'var(--s2-text-dark)'}, min: 0, max: 10, ticks:{color:'var(--s2-text-dark)'}, grid:{color:'var(--s2-border)'} } }, plugins: { legend: { display: false }, tooltip: { ...tooltipTitleCallback, callbacks: { ...tooltipTitleCallback.callbacks, label: function(context) { return `${context.dataset.label}: Value ${context.parsed.y}, Feasibility ${context.parsed.x}, Actionability (Size) ${context.raw.r}`; } } } } } };
+        if (s2PrioritizationMatrixChartInstance) s2PrioritizationMatrixChartInstance.destroy();
+        s2PrioritizationMatrixChartInstance = new Chart(document.getElementById('s2PrioritizationMatrixChart').getContext('2d'), config);
+    }
+
+    // --- Section 3: Measure Results ---
+    const s3KpiUseCaseSelectEl = document.getElementById('s3-kpi-use-case-select');
+    const s3KpiModalEl = document.getElementById('s3-kpi-modal');
+    const s3KpiFormEl = document.getElementById('s3-kpi-form');
+    const s3KpisListEl = document.getElementById('s3-kpis-list');
+    const s3OpenAddKpiBtn = document.getElementById('s3-open-add-kpi-modal-btn');
+    let editingKpiId = null;
+
+    function renderS3UseCaseDropdown() {
+        s3KpiUseCaseSelectEl.innerHTML = '<option value="">Select a Prioritized Use Case...</option>';
+        const highPriorityUseCases = clientData.prioritize.useCases.filter(uc => uc.summaryScores.value >= 5 && uc.summaryScores.feasibility >= 5 && uc.status === 'Prioritized' || uc.status === 'Development' || uc.status === 'Deployed');
+        highPriorityUseCases.forEach(uc => {
+            const option = document.createElement('option');
+            option.value = uc.id;
+            option.textContent = uc.name;
+            s3KpiUseCaseSelectEl.appendChild(option);
+        });
+        s3OpenAddKpiBtn.disabled = s3KpiUseCaseSelectEl.options.length <= 1 || !s3KpiUseCaseSelectEl.value;
+    }
+    s3KpiUseCaseSelectEl.addEventListener('change', () => {
+         s3OpenAddKpiBtn.disabled = !s3KpiUseCaseSelectEl.value;
+         renderS3Kpis(); 
+    });
+
+    function renderS3Kpis() {
+        s3KpisListEl.innerHTML = '';
+        const selectedUseCaseId = s3KpiUseCaseSelectEl.value;
+        const kpisForSelectedUseCase = clientData.measure.kpis.filter(kpi => kpi.useCaseId === selectedUseCaseId);
+
+        if (selectedUseCaseId && kpisForSelectedUseCase.length > 0) {
+             kpisForSelectedUseCase.forEach(kpi => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 style="color: var(--s3-text-dark);">${kpi.name} <span class="text-xs font-normal">(${kpi.category} - ${kpi.kpiType || 'Standard'})</span></h4>
+                            <p><strong class="detail-label">Desc:</strong> ${kpi.description || 'N/A'}</p>
+                            <p><strong class="detail-label">Baseline:</strong> ${kpi.baseline || 'N/A'} ${kpi.unit || ''} | <strong class="detail-label">Target:</strong> ${kpi.target || 'N/A'} ${kpi.unit || ''} | <strong class="detail-label">Actual:</strong> ${kpi.actual || 'N/A'} ${kpi.unit || ''}</p>
+                            <p><strong class="detail-label">Linked Value:</strong> ${kpi.linkValue || 'N/A'}</p>
+                            <p><strong class="detail-label">Monitoring:</strong> ${kpi.monitorMethod || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <button class="action-button edit-button text-xs s3-button mb-1 w-full" data-id="${kpi.id}" data-usecase-id="${kpi.useCaseId}">Edit</button>
+                            <button class="action-button delete-button text-xs w-full" data-id="${kpi.id}">Delete</button>
+                        </div>
+                    </div>
+                `;
+                s3KpisListEl.appendChild(card);
+            });
+        } else if (selectedUseCaseId) {
+            s3KpisListEl.innerHTML = `<p class="text-sm text-center py-4" style="color: var(--s3-text-dark);">No KPIs defined for this use case yet.</p>`;
+        } else {
+             s3KpisListEl.innerHTML = `<p class="text-sm text-center py-4" style="color: var(--s3-text-dark);">Select a prioritized use case above to view or add KPIs.</p>`;
+        }
+        renderS3KpiCategoriesChart();
+    }
+    
+    s3OpenAddKpiBtn.addEventListener('click', () => {
+        const selectedUseCaseId = s3KpiUseCaseSelectEl.value;
+        if (!selectedUseCaseId) { showToast('Please select a use case first.'); return; }
+        editingKpiId = null;
+        document.getElementById('s3-kpi-modal-title').textContent = 'Add New KPI';
+        s3KpiFormEl.reset();
+        document.getElementById('s3-kpi-use-case-ref-id').value = selectedUseCaseId;
+        openModal('s3-kpi-modal');
+    });
+    document.getElementById('s3-close-kpi-modal-btn').addEventListener('click', () => closeModal('s3-kpi-modal'));
+
+    s3KpiFormEl.addEventListener('submit', e => {
+        e.preventDefault();
+        const kpiData = {
+            id: editingKpiId || generateId(),
+            useCaseId: document.getElementById('s3-kpi-use-case-ref-id').value,
+            name: document.getElementById('s3-kpi-name').value.trim(),
+            description: document.getElementById('s3-kpi-description').value.trim(),
+            baseline: document.getElementById('s3-kpi-baseline').value.trim(),
+            target: document.getElementById('s3-kpi-target').value.trim(),
+            actual: document.getElementById('s3-kpi-actual').value.trim(),
+            unit: document.getElementById('s3-kpi-unit').value.trim(),
+            category: document.getElementById('s3-kpi-category').value,
+            kpiType: document.getElementById('s3-kpi-type').value,
+            linkValue: document.getElementById('s3-kpi-link-value').value.trim(),
+            monitorMethod: document.getElementById('s3-kpi-monitor-method').value.trim(),
+        };
+        if (editingKpiId) {
+            const index = clientData.measure.kpis.findIndex(k => k.id === editingKpiId);
+            if (index > -1) clientData.measure.kpis[index] = kpiData;
+        } else {
+            clientData.measure.kpis.push(kpiData);
+        }
+        renderS3Kpis();
+        closeModal('s3-kpi-modal');
+    });
+
+    s3KpisListEl.addEventListener('click', e => {
+        const target = e.target.closest('button');
+        if (!target) return;
+        const id = target.dataset.id;
+
+        if (target.classList.contains('delete-button')) {
+            clientData.measure.kpis = clientData.measure.kpis.filter(k => k.id !== id);
+            renderS3Kpis();
+        } else if (target.classList.contains('edit-button')) {
+            const kpi = clientData.measure.kpis.find(k => k.id === id);
+            if (kpi) {
+                editingKpiId = id;
+                document.getElementById('s3-kpi-modal-title').textContent = 'Edit KPI';
+                document.getElementById('s3-kpi-id').value = kpi.id;
+                document.getElementById('s3-kpi-use-case-ref-id').value = kpi.useCaseId;
+                document.getElementById('s3-kpi-name').value = kpi.name;
+                document.getElementById('s3-kpi-description').value = kpi.description || '';
+                document.getElementById('s3-kpi-baseline').value = kpi.baseline || '';
+                document.getElementById('s3-kpi-target').value = kpi.target || '';
+                document.getElementById('s3-kpi-actual').value = kpi.actual || '';
+                document.getElementById('s3-kpi-unit').value = kpi.unit || '';
+                document.getElementById('s3-kpi-category').value = kpi.category;
+                document.getElementById('s3-kpi-type').value = kpi.kpiType || 'Standard';
+                document.getElementById('s3-kpi-link-value').value = kpi.linkValue || '';
+                document.getElementById('s3-kpi-monitor-method').value = kpi.monitorMethod || '';
+                openModal('s3-kpi-modal');
+            }
+        }
+    });
+
+    function renderS3KpiCategoriesChart() {
+        const categoryCounts = {};
+        const categories = ["Model Quality", "System Metrics", "Adoption Metrics", "Operational Metrics", "Business Impact", "Risk & Governance"];
+        categories.forEach(cat => categoryCounts[cat] = 0);
+        clientData.measure.kpis.forEach(kpi => {
+            if (categoryCounts.hasOwnProperty(kpi.category)) {
+                categoryCounts[kpi.category]++;
+            }
+        });
+        const data = {
+            labels: categories.map(c => wrapLabels(c,12)),
+            datasets: [{
+                label: 'KPI Categories Distribution',
+                data: Object.values(categoryCounts),
+                backgroundColor: [ 'rgba(199, 21, 133, 0.7)', 'rgba(138, 43, 226, 0.7)', 'rgba(219, 112, 147, 0.7)', 'rgba(123, 104, 238, 0.7)', 'rgba(255, 105, 180, 0.7)', 'rgba(72, 61, 139, 0.7)' /* DarkSlateBlue */ ],
+                borderColor: ['#C71585', '#8A2BE2', '#DB7093', '#7B68EE', '#FF69B4', '#483D8B'],
+                borderWidth: 1
+            }]
+        };
+        const config = { type: 'doughnut', data: data, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: {font:{size:9}, color: 'var(--s3-text-dark)'} }, tooltip: tooltipTitleCallback } } };
+        if (s3KpiCategoriesChartInstance) s3KpiCategoriesChartInstance.destroy();
+        s3KpiCategoriesChartInstance = new Chart(document.getElementById('s3KpiCategoriesChart').getContext('2d'), config);
+    }
+
+    // --- Initial Render ---
+    function renderAll() {
+        // Populate all form fields and lists
+        // Section 1
+        document.getElementById('s1-corporate-strategy').value = clientData.vision.corporateStrategy || '';
+        document.getElementById('s1-ai-ambition').value = clientData.vision.aiAmbition || '';
+        document.getElementById('s1-vision-methodology').value = clientData.vision.visionMethodology || '';
+        renderS1Priorities(); 
+        renderS1BottomUpIdeas();
+        document.getElementById('s1-cap-data').value = clientData.vision.capabilities.data || '';
+        document.getElementById('s1-cap-tech').value = clientData.vision.capabilities.tech || '';
+        document.getElementById('s1-cap-talent').value = clientData.vision.capabilities.talent || '';
+        document.getElementById('s1-cap-process').value = clientData.vision.capabilities.process || '';
+        document.getElementById('s1-cap-ethics').value = clientData.vision.capabilities.ethics || '';
+        renderS1CapabilityChart();
+        document.getElementById('s1-stakeholder-groups').value = clientData.vision.stakeholderGroups || '';
+        document.getElementById('s1-communication-strategy').value = clientData.vision.communicationStrategy || '';
+        document.getElementById('s1-adkar-awareness').checked = clientData.vision.adkar.awareness || false;
+        document.getElementById('s1-adkar-desire').checked = clientData.vision.adkar.desire || false;
+        document.getElementById('s1-adkar-knowledge').checked = clientData.vision.adkar.knowledge || false;
+        document.getElementById('s1-adkar-ability').checked = clientData.vision.adkar.ability || false;
+        document.getElementById('s1-adkar-reinforcement').checked = clientData.vision.adkar.reinforcement || false;
+        document.getElementById('s1-leadership-commitment').checked = clientData.vision.leadershipCommitment || false;
+        document.getElementById('s1-ai-culture-plan').checked = clientData.vision.aiCulturePlan || false;
+        document.getElementById('s1-initial-ethical-guardrails').value = clientData.vision.initialEthicalGuardrails || '';
+        document.getElementById('s1-uncertainty-learning').value = clientData.vision.uncertaintyLearning || '';
+        // Section 2
+        renderS2UseCases(); 
+        document.getElementById('s2-roadmap-notes').value = clientData.prioritize.roadmapNotes || '';
+        // Section 3
+        renderS3Kpis(); 
+        document.getElementById('s3-roi-notes').value = clientData.measure.roiNotes || '';
+        document.getElementById('s3-ethical-notes').value = clientData.measure.ethicalNotes || '';
+    }
+
+    const initialSavedData = localStorage.getItem(LS_KEY);
+    if (initialSavedData) {
+        const parsedData = JSON.parse(initialSavedData);
+        // Deep merge or careful assignment to ensure all nested properties are initialized
+        clientData.vision = {...clientData.vision, ...(parsedData.vision || {})};
+        clientData.vision.capabilities = {...clientData.vision.capabilities, ...(parsedData.vision?.capabilities || {})};
+        clientData.vision.adkar = {...clientData.vision.adkar, ...(parsedData.vision?.adkar || {})};
+        clientData.vision.strategicPriorities = parsedData.vision?.strategicPriorities || [];
+        clientData.vision.strategicPriorities.forEach(p => {
+            if (!p.themes) p.themes = [];
+        });
+        clientData.vision.bottomUpIdeas = parsedData.vision?.bottomUpIdeas || [];
+
+        clientData.prioritize = {...clientData.prioritize, ...(parsedData.prioritize || {})};
+        clientData.prioritize.useCases = parsedData.prioritize?.useCases || [];
+         clientData.prioritize.useCases.forEach(uc => { // Ensure all new nested objects for use cases exist on load
+            const defaults = { name: '', themeId: '', source: '', valueDetails: {}, feasibilityDetails: {}, dataReadiness: {}, raiDetails: {}, otherCriteria: {}, summaryScores: {value:0, feasibility:0, actionability:1}, status: 'Ideation', timeline: 'Medium-term', notesSummary: ''};
+            for (const key in defaults) { if (uc[key] === undefined) uc[key] = defaults[key]; }
+            const detailObjects = ['valueDetails', 'feasibilityDetails', 'dataReadiness', 'raiDetails', 'otherCriteria'];
+            detailObjects.forEach(objKey => { if(typeof uc[objKey] !== 'object' || uc[objKey] === null) uc[objKey] = {}; });
+            if(typeof uc.summaryScores !== 'object' || uc.summaryScores === null) uc.summaryScores = {value:0, feasibility:0, actionability:1};
+        });
+
+
+        clientData.measure = {...clientData.measure, ...(parsedData.measure || {})};
+        clientData.measure.kpis = parsedData.measure?.kpis || [];
+        clientData.measure.kpis.forEach(kpi => { // Ensure new kpi fields exist on load
+             const kpiDefaults = { actual: '', kpiType: 'Standard', linkValue: '', monitorMethod: ''};
+             for (const key in kpiDefaults) { if (kpi[key] === undefined) kpi[key] = kpiDefaults[key]; }
+        });
+
+    }
+    renderAll();
+    </script>
+</body>
+</html>
